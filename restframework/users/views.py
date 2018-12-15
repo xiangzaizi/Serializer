@@ -1,7 +1,8 @@
 from django.http import HttpResponse
+from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 
 
 from users.models import Department
@@ -76,3 +77,37 @@ class DepartmentDetailAPIView(APIView):
         department.delete()
         # 响应请求
         return Response(status=204)
+"""GenericAPIView + 拓展类"""
+class DepartmentListAPIView2(ListModelMixin, CreateModelMixin, GenericAPIView):
+    # 部门查询集
+    queryset = Department.objects.all()
+    # 使用的序列化器
+    serializer_class = DepartmentSerializer
+
+    # get /departments/(d+)/
+    def get(self, request):
+        return self.list(request)  # ListModelMixin
+
+    # post /departments
+    def post(self, request):
+        return self.create(request)  # CreateModelMixin
+
+class DepartmentDetailAPIView2(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericAPIView):
+    # 首先两步,指定指定模型 + 对应的序列化器
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
+
+    # get /departments/(\d+)/
+    def get(self, request, pk):
+        """查询一条数据"""
+        return self.retrieve(request, pk)  # RetrieveModelMixin
+
+    # put /departments/(\d+)/
+    def put(self, request, pk):
+        """修改一条数据"""
+        return self.update(request, pk)  # UpdateModelMixin
+
+    # delete /departments/(\d+)/
+    def delete(self, request, pk):
+        """删除一条数据"""
+        return self.destroy(request, pk)  # DestroyModelMixin

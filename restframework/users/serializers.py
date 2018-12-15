@@ -55,7 +55,7 @@ class DepartmentSerializer(serializers.Serializer):
     # employee_set = serializers.PrimaryKeyRelatedField(
     #     label='部门员工', read_only=True, many=True)
     # 方式一:
-    employee_set = EmployeeSerializer(many=True, read_only=True)
+    # employee_set = EmployeeSerializer(many=True, read_only=True)
 
     # 参数校验方式2:
     def validate_name(self, value):
