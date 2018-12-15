@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
@@ -111,3 +111,15 @@ class DepartmentDetailAPIView2(RetrieveModelMixin, UpdateModelMixin, DestroyMode
     def delete(self, request, pk):
         """删除一条数据"""
         return self.destroy(request, pk)  # DestroyModelMixin
+
+"""可用子类  ListAPIView + RetrieveAPIView"""
+class DepartmentListAPIView3(ListAPIView):
+    """查询多个部门"""
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
+
+
+class DepartmentDetailAPIView3(RetrieveAPIView):
+    """查询一个部门"""
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
