@@ -1,12 +1,15 @@
 from django.http import HttpResponse
 from rest_framework.generics import GenericAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
-
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.decorators import action
 
 from users.models import Department
-from users.serializers import DepartmentSerializer
+from users.serializers import DepartmentSerializer, DepartmentNameSerializer
 
 
 def index(request):
@@ -136,3 +139,70 @@ class DepartmentAPIView4(ListModelMixin, RetrieveModelMixin, GenericAPIView):
             return self.retrieve(self, request, *args, **kwargs)
         else: # 列表
             return self.list(self, request, *args, **kwargs)
+
+""" 视图集"""
+class MyPermission(BasePermission):
+    """自定义权限"""
+
+    def has_permission(self, request, view):
+        # 用户未登录无权限访问 list 动作(即查询所有部门)
+        if view.action == 'list' and not request.user.is_authenticated():
+            return False
+        else:
+            return True  # 有权限
+
+
+class LargeResultsSetPagination(PageNumberPagination):
+    page_size = 2  # 每页显示2条
+    page_query_param = 'page'  # 查询关键字名称：第几页
+    page_size_query_param = 'page_size'  # 查询关键字名称：每页多少条
+
+
+class DepartmentViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
+
+    # 权限控制
+    # permission_classes = [IsAuthenticated]   # 登录后才能访问,
+    # permission_classes = [MyPermission]       # 改成自己定义的登录后才能访问所有的部门,其他接口可以任意调用
+
+    # 过滤操作
+    filter_fields = ('name',)
+    # 指定分页配置
+    pagination_class = LargeResultsSetPagination
+
+    def get_serializer_class(self):
+        """使用不同的序列化器"""
+        if self.action == 'name':  # name为自定义的action(修改部门名称)
+            return DepartmentNameSerializer
+        else:
+            return DepartmentSerializer
+
+    # detail为False 表示不需要根据主键操作一个模型类对象
+    #
+    @action(methods=['get'], detail=False)
+    def latest(self, request):
+        """
+        自定义action: 查询最新成立的部门
+        """
+        department = Department.objects.latest('create_date')
+        serializer = self.get_serializer(department)
+        return Response(serializer.data)
+
+    # detail为true表示需要根据主键操作一个模型类对象，
+    # 则方法需要添加一个`pk`参数，来接收url传进来的主键
+    # True, 配置请求的时候要匹配上ID
+    @action(methods=['put'], detail=True)
+    def name(self, request, pk):
+        """
+        自定义action: 修改部门名称
+        :param request: 请求对象
+        :param pk: 要修改部门的主键
+        :return:
+        """
+        dep = self.get_object()
+        dep.name = request.data.get('name')
+        dep.save()
+        serializer = self.get_serializer(dep)
+        return Response(serializer.data)
+
