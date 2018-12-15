@@ -5,11 +5,11 @@ from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
-from rest_framework.viewsets import GenericViewSet
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.decorators import action
 
-from users.models import Department
-from users.serializers import DepartmentSerializer, DepartmentNameSerializer
+from users.models import Department, Employee
+from users.serializers import DepartmentSerializer, DepartmentNameSerializer, EmployeeSerializer
 
 
 def index(request):
