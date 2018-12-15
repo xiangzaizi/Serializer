@@ -123,3 +123,16 @@ class DepartmentDetailAPIView3(RetrieveAPIView):
     """查询一个部门"""
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
+
+""" 在同一个类中实现get请求的两个业务操作 """
+class DepartmentAPIView4(ListModelMixin, RetrieveModelMixin, GenericAPIView):
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
+
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get('pk', '')
+        print('pk=', pk)
+        if pk: # 详情
+            return self.retrieve(self, request, *args, **kwargs)
+        else: # 列表
+            return self.list(self, request, *args, **kwargs)
