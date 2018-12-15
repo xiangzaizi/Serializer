@@ -206,3 +206,11 @@ class DepartmentViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
         serializer = self.get_serializer(dep)
         return Response(serializer.data)
 
+
+class EmployeeViewSet(ModelViewSet):
+    """
+    ModelViewSet封装了: 增删改查(一条,多条)
+    只是将其他结果mixin的类封装在了一起,点开源代码就明白了, mixin是内部封装了校验参数这步所以可以直接调用
+    """
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer

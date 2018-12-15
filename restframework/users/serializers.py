@@ -9,8 +9,6 @@ from rest_framework.validators import UniqueValidator
 
 from users.models import Department, Employee
 
-GenericAPIView
-
 
 class EmployeeSerializer(serializers.Serializer):
     choices_gender = (
@@ -31,6 +29,28 @@ class EmployeeSerializer(serializers.Serializer):
     department = serializers.PrimaryKeyRelatedField(label='所属部门', read_only=True)
     # 方式二：　序列化部门对象所有字段
     # department = DepartmentSerializer()
+
+    def create(self, validated_data):
+        """新增一个员工"""
+        # OrderedDict类型
+        # return Department.objects.create(name='xxx', create_date=xxx)  # 关键字参数
+        return Employee.objects.create(**validated_data)
+
+    # def update(self, instance, validated_data):
+    #     """
+    #     修改员工信息
+    #     :param instance: Department对象,表示要修改的部门
+    #     :param validated_data: 用户请求传递过来的参数,OrderedDict类型
+    #     :return:
+    #     """
+    #     instance.name = validated_data.get('name', instance.name)
+    #     instance.age = validated_data.get('age', instance.age)
+    #     instance.gender = validated_data.get('gender', instance.gender)
+    #     instance.salary = validated_data.get('salary', instance.salary)
+    #     instance.comment = validated_data.get('comment', instance.comment)
+    #     instance.hire_date = validated_data.get('hire_date', instance.hire_date)
+    #     instance.save()  # 修改数据库数据
+    #     return instance
 
 
 class DepartmentSerializer(serializers.Serializer):

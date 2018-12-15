@@ -20,8 +20,8 @@ urlpatterns = [
     # 值: action动作，　要调用的业务方法名
     # url(r'^departments5/$', views.DepartmentViewSet.as_view({'get': 'list'})),
     # url(r'^departments5/(?P<pk>\d+)/$', views.DepartmentViewSet.as_view({'get': 'retrieve'})),
-    url(r'^departments5/latest/', views.DepartmentViewSet.as_view({'get': 'latest'})),  # action, 查找最新添加的数据
-    url(r'^departments5/(?P<pk>\d+)/name/$', views.DepartmentViewSet.as_view({'put': 'name'})),  # action, 指定修改部门的名称
+    # url(r'^departments5/latest/', views.DepartmentViewSet.as_view({'get': 'latest'})),  # action, 查找最新添加的数据
+    # url(r'^departments5/(?P<pk>\d+)/name/$', views.DepartmentViewSet.as_view({'put': 'name'})),  # action, 指定修改部门的名称
 
 ]
 
@@ -29,6 +29,6 @@ urlpatterns = [
 router = SimpleRouter()
 # router = DefaultRouter() # API root 会展示列表以外的视图集, 就是请求的URL 会展示出来
 # 参数1: 路由地址的前缀
-router.register(r'departments', views.DepartmentViewSet)
-
+router.register(r'departments5', views.DepartmentViewSet)
+router.register(r'employee5', views.EmployeeViewSet)
 urlpatterns += router.urls
